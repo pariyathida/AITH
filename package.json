@@ -4,6 +4,8 @@
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
+		"pretty": "prettier --write --tab-width 4 \"./**/*.js\"",
+		"precommit": "lint-staged && npm test",
 		"test": "jest"
 	},
 	"dependencies": {
@@ -13,10 +15,19 @@
 	"devDependencies": {
 		"babel-jest": "20.0.3",
 		"babel-preset-react-native": "2.1.0",
-		"jest": "20.0.4",
+		"husky": "^0.14.3",
+		"jest": "^22.4.3",
+		"lint-staged": "^7.0.0",
+		"prettier": "^1.11.1",
 		"react-test-renderer": "16.0.0-alpha.12"
 	},
 	"jest": {
 		"preset": "react-native"
+	},
+	"lint-staged": {
+    "*.js": [
+        "yarn pretty",
+        "git add"
+    ]
 	}
 }

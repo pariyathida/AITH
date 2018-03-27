@@ -4,10 +4,8 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-} from 'react-native';
+import React, { Component } from "react";
+import { AppRegistry } from "react-native";
 
-import Game from './game.js';
-AppRegistry.registerComponent('Game', () => Game);
+import Game from "./game.js";
+AppRegistry.registerComponent("Game", () => Game);

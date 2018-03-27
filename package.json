@@ -7,8 +7,10 @@
 		"test": "jest"
 	},
 	"dependencies": {
+		"create-react-context": "^0.2.1",
 		"react": "16.0.0-alpha.12",
-		"react-native": "0.46.4"
+		"react-native": "0.46.4",
+		"styled-components": "^3.2.3"
 	},
 	"devDependencies": {
 		"babel-eslint": "^8.2.2",

@@ -1,4 +1,6 @@
 import React, {Component} from 'react'
+import styled from 'styled-components/native'
+import createContext from 'create-react-context'
 
 import {
   Alert,
@@ -12,15 +14,123 @@ import {
 
 const STORAGE_KEY = '@Game:data'
 const timeLimit = 10
-const timer = null
+const grids = [...Array(3)].map((_, i) => i)
+const initialHoles = [...Array(9)].map(() => false)
 
-const Turtle = () => (
-  <TouchableHighlight style={styles.touch} onPress={this.props.onPress}>
-    <Text style={styles.icon}>{this.props.show ? '🐢' : ''}</Text>
-  </TouchableHighlight>
+const Turtle = ({onPress, show}) => (
+  <Touch onPress={onPress}>{show && <Emoji>🐢</Emoji>}</Touch>
 )
 
-const initialHoles = [...Array(9)].map(() => false)
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: #000d1a;
+`
+
+const TopBar = styled.View`
+  marginTop: 15,
+  flexDirection: 'row',
+  flex: 1.5,
+  alignItems: 'center',
+`
+
+const HighScore = styled.View`
+  flex: 1;
+  background-color: #000d1a;
+  margin: 10;
+`
+
+const Timeout = styled.View`
+  flex: 1,
+  background-color: #000d1a;
+  margin: 10;
+`
+
+const CurrentScore = styled.Text`
+  flex: 1,
+  background-color: #000d1a;
+  margin: 10;
+`
+
+const Title = styled.Text`
+  text-align: center;
+  color: white;
+`
+
+const Value = styled.Text`
+  text-align: center;
+  font-size: 30;
+  font-weight: bold;
+  color: white;
+`
+
+const Row = styled.View`
+  flex: 1;
+  flex-direction: row;
+  background-color: #00264d;
+`
+
+const HoleContainer = styled.View`
+  flex: 1,
+  backgroundColor: '#e6f2ff',
+  margin: 10,
+  borderRadius: 10,
+`
+
+const HoleRows = styled.View`
+  flex: 7;
+  flex-direction: column;
+  border-width: 1;
+  width: 100%;
+`
+
+const BottomBar = styled.View`
+  padding-top: 20;
+  flex: 1;
+  align-items: 'center';
+`
+
+const StartButton = styled.View`
+  color: white;
+  background-color: darkblue;
+  margin: 20;
+  padding: 10;
+`
+
+const Emoji = styled.Text`
+  text-align: center;
+  font-size: 50;
+  padding-top: 25%;
+`
+
+const Touch = styled.View`
+  flex: 1;
+  border-radius: 10;
+  justify-content: center;
+`
+
+const {Provider, Consumer} = createContext('turtle')
+
+const Hole = ({hole}) => (
+  <Consumer>
+    {props => (
+      <HoleContainer>
+        <Turtle
+          show={props.holes[hole]}
+          onPress={() => props.handleTouch(hole)}
+        />
+      </HoleContainer>
+    )}
+  </Consumer>
+)
+
+const Display = ({title, value, is: Base}) => (
+  <Base>
+    <Title>{title}</Title>
+    <Value>{title}</Value>
+  </Base>
+)
 
 export default class Game extends Component {
   state = {
@@ -32,37 +142,32 @@ export default class Game extends Component {
   }
 
   showTurtles = () => {
-    const {hole: currentHoles} = this.state
+    const {holes, playing} = this.state
     const randomNumber = Math.floor(Math.random() * 9)
 
-    if (!currentHoles[randomNumber]) {
-      currentHoles[randomNumber] = true
+    if (!holes[randomNumber]) {
+      holes[randomNumber] = true
 
-      setTimeout(function() {
-        currentHoles[randomNumber] = false
+      setTimeout(() => {
+        holes[randomNumber] = false
       }, 2000)
 
-      // if (!Math.floor(Math.random()*3)){
-      //   currentHoles = [false, false, false, false, false, false, false, false, false];
-      // }
-
-      this.setState({holes: currentHoles})
+      this.setState({holes})
     }
 
-    if (!this.state.playing) {
+    if (!playing) {
       clearInterval(this.appearTimer)
-      this.setState({
-        holes: initialHoles,
-      })
+
+      this.setState({holes: initialHoles})
     }
   }
 
   update = () => {
-    this.setState({
-      timeout: this.state.timeout - 1,
-    })
+    const {timeout} = this.state
 
-    if (this.state.timeout == 0) {
+    this.setState({timeout: timeout - 1)
+
+    if (timeout === 0) {
       this.endGame()
     }
   }
@@ -70,7 +175,7 @@ export default class Game extends Component {
   startGame = () => {
     this.setState({
       timeout: timeLimit,
-      playing: true,
+      isPlaying: true,
       currentScore: 0,
     })
 
@@ -95,10 +200,9 @@ export default class Game extends Component {
   endGame() {
     const {currentScore, highScore} = this.state
 
-    clearInterval(timer)
-    this.setState({
-      playing: false,
-    })
+    clearInterval(this.timer)
+
+    this.setState({playing: false})
 
     if (currentScore > highScore) {
       Alert.alert('YEAH! you got a new high score.')
@@ -131,183 +235,42 @@ export default class Game extends Component {
     }
   }
 
-  render = () => (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <View style={styles.highScore}>
-          <Text style={styles.title}>High Score</Text>
-          <Text style={styles.number}>{this.state.highScore}</Text>
-        </View>
-        <View style={styles.timeout}>
-          <Text style={styles.title}>Timeout</Text>
-          <Text style={styles.number}>{this.state.timeout}</Text>
-        </View>
-        <View style={styles.currentScore}>
-          <Text style={styles.title}>Score</Text>
-          <Text style={styles.number}>{this.state.currentScore}</Text>
-        </View>
-      </View>
-      <View style={styles.holeRows}>
-        <View style={styles.row}>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[0]}
-              onPress={() => this._handleTouch(0)}
+  render = () => {
+    const {
+      isPlaying,
+      holes,
+      handleTouch,
+      currentScore,
+      highScore,
+      timeout,
+    } = this.state
+
+    return (
+      <Provider values={{holes, handleTouch}}>
+        <Container>
+          <TopBar>
+            <Display label="High Score" value={highScore} is={HighScore} />
+            <Display label="Timeout" value={timeout} is={Timeout} />
+            <Display
+              label="Current Score"
+              value={currentScore}
+              is={CurrentScore}
             />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[1]}
-              onPress={() => this._handleTouch(1)}
+          </TopBar>
+          <HoleRows>
+            {grids.map(i => (
+              <Row key={i}>{grids.map(j => <Hole key={j} hole={i + j} />)}</Row>
+            ))}
+          </HoleRows>
+          <BottomBar>
+            <StartButton
+              title="Start Game"
+              onPress={this.startGame}
+              disabled={isPlaying}
             />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[2]}
-              onPress={() => this._handleTouch(2)}
-            />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[3]}
-              onPress={() => this._handleTouch(3)}
-            />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[4]}
-              onPress={() => this._handleTouch(4)}
-            />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[5]}
-              onPress={() => this._handleTouch(5)}
-            />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[6]}
-              onPress={() => this._handleTouch(6)}
-            />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[7]}
-              onPress={() => this._handleTouch(7)}
-            />
-          </View>
-          <View style={styles.hole}>
-            <Turtle
-              show={this.state.holes[8]}
-              onPress={() => this._handleTouch(8)}
-            />
-          </View>
-        </View>
-      </View>
-      <View style={styles.buttomBar}>
-        <Button
-          title="start game"
-          style={styles.startButton}
-          onPress={this.startGame.bind(this)}
-          disabled={this.state.playing}
-        />
-      </View>
-    </View>
-  )
+          </BottomBar>
+        </Container>
+      </Provider>
+    )
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000d1a',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  topBar: {
-    marginTop: 15,
-    flexDirection: 'row',
-    flex: 1.5,
-    alignItems: 'center',
-  },
-  highScore: {
-    flex: 1,
-    backgroundColor: '#000d1a',
-
-    margin: 10,
-  },
-  timeout: {
-    flex: 1,
-    backgroundColor: '#000d1a',
-
-    margin: 10,
-  },
-  currentScore: {
-    flex: 1,
-    backgroundColor: '#000d1a',
-
-    margin: 10,
-  },
-  title: {
-    textAlign: 'center',
-    color: 'white',
-  },
-  number: {
-    textAlign: 'center',
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  holeRows: {
-    flex: 7,
-    flexDirection: 'column',
-    borderWidth: 1,
-    width: '100%',
-  },
-  row: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#00264d',
-  },
-  hole: {
-    flex: 1,
-    backgroundColor: '#e6f2ff',
-    margin: 10,
-    borderRadius: 10,
-  },
-  buttomBar: {
-    paddingTop: 20,
-    flex: 1,
-    alignItems: 'center',
-  },
-  startButton: {
-    color: 'white',
-    backgroundColor: 'darkblue',
-    margin: 20,
-    padding: 10,
-  },
-  icon: {
-    textAlign: 'center',
-    fontSize: 50,
-    paddingTop: '25%',
-  },
-  touch: {
-    flex: 1,
-    borderRadius: 10,
-    justifyContent: 'center',
-  },
-})

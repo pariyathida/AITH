@@ -59,7 +59,7 @@ const Row = styled.View`
 
 const HoleContainer = styled.View`
   flex: 1;
-  background-color: '#e6f2ff';
+  background-color: #e6f2ff;
   margin: 10px;
   border-radius: 10px;
 `
@@ -77,7 +77,7 @@ const BottomBar = styled.View`
   align-items: center;
 `
 
-const StartButton = styled.View`
+const StartButton = styled.Text`
   color: white;
   background-color: darkblue;
   margin: 20px;

@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 import {Alert, AsyncStorage} from 'react-native'
 import styled from 'styled-components/native'
 
+import Board from './Board'
+import Display from './Display'
+
 // The key used to store the high score in AsyncStorage
 const HIGH_SCORE_KEY = 'game:highScore'
 
@@ -9,14 +12,10 @@ const HIGH_SCORE_KEY = 'game:highScore'
 const timeLimit = 10
 
 // The rows in the game's grid
-const gridRows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+const rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
 // There are initially nine holes, all which defaults to false
 const initialHoles = [...Array(9)].map(() => false)
-
-const Turtle = ({onPress, show}) => (
-  <Touch onPress={onPress}>{show && <Emoji>🐢</Emoji>}</Touch>
-)
 
 const Container = styled.View`
   flex: 1;
@@ -32,44 +31,6 @@ const TopBar = styled.View`
   align-items: center;
 `
 
-const DisplayContainer = styled.View`
-  flex: 1;
-  background-color: #000d1a;
-  margin: 10px;
-`
-
-const Title = styled.Text`
-  color: white;
-  text-align: center;
-`
-
-const Value = styled.Text`
-  text-align: center;
-  font-size: 30px;
-  font-weight: bold;
-  color: white;
-`
-
-const Row = styled.View`
-  flex: 1;
-  flex-direction: row;
-  background-color: #00264d;
-`
-
-const HoleContainer = styled.TouchableOpacity`
-  flex: 1;
-  background-color: #e6f2ff;
-  margin: 10px;
-  border-radius: 10px;
-`
-
-const HoleRows = styled.View`
-  flex: 7;
-  flex-direction: column;
-  border-width: 1;
-  width: 100%;
-`
-
 const BottomBar = styled.View`
   padding-top: 20px;
   flex: 1;
@@ -80,31 +41,6 @@ const StartButton = styled.Button`
   margin: 20px;
   padding: 10px;
 `
-
-const Emoji = styled.Text`
-  text-align: center;
-  font-size: 50px;
-  padding-top: 25%;
-`
-
-const Touch = styled.View`
-  flex: 1;
-  border-radius: 10;
-  justify-content: center;
-`
-
-const Hole = ({hole, holes, handleTouch}) => (
-  <HoleContainer onPress={() => handleTouch(hole)}>
-    <Turtle show={holes[hole]} />
-  </HoleContainer>
-)
-
-const Display = ({title, value}) => (
-  <DisplayContainer>
-    <Title>{title}</Title>
-    <Value>{value}</Value>
-  </DisplayContainer>
-)
 
 export default class Game extends Component {
   state = {
@@ -227,20 +163,9 @@ export default class Game extends Component {
           <Display title="Timeout" value={timeout} />
           <Display title="Current Score" value={currentScore} />
         </TopBar>
-        <HoleRows>
-          {gridRows.map((row, i) => (
-            <Row key={i}>
-              {row.map(col => (
-                <Hole
-                  key={col}
-                  hole={col}
-                  holes={holes}
-                  handleTouch={this.handleTouch}
-                />
-              ))}
-            </Row>
-          ))}
-        </HoleRows>
+
+        <Board rows={rows} holes={holes} handleTouch={this.handleTouch} />
+
         <BottomBar>
           <StartButton
             color="#3498db"

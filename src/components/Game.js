@@ -118,7 +118,7 @@ export default class Game extends Component {
     highScore: 0,
     currentScore: 0,
     timeout: 0,
-    playing: false,
+    isPlaying: false,
     holes: initialHoles,
   }
 
@@ -164,7 +164,7 @@ export default class Game extends Component {
   }
 
   showTurtles = () => {
-    const {holes, playing} = this.state
+    const {holes, isPlaying} = this.state
     const randomNumber = Math.floor(Math.random() * 9)
 
     if (!holes[randomNumber]) {
@@ -177,7 +177,7 @@ export default class Game extends Component {
       this.setState({holes})
     }
 
-    if (!playing) {
+    if (!isPlaying) {
       clearInterval(this.appearTimer)
 
       this.setState({holes: initialHoles})
@@ -198,7 +198,7 @@ export default class Game extends Component {
     const {currentScore, highScore} = this.state
     clearInterval(this.timer)
 
-    this.setState({playing: false})
+    this.setState({isPlaying: false})
 
     if (currentScore > highScore) {
       Alert.alert('YEAH! you got a new high score.')

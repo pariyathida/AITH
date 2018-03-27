@@ -3,8 +3,9 @@ import {Alert, AsyncStorage} from 'react-native'
 import styled from 'styled-components/native'
 import createContext from 'create-react-context'
 
-const STORAGE_KEY = '@Game:data'
+const HIGH_SCORE_KEY = 'game:highScore'
 const timeLimit = 10
+
 const grids = [...Array(3)].map((_, i) => i)
 const initialHoles = [...Array(9)].map(() => false)
 
@@ -20,10 +21,10 @@ const Container = styled.View`
 `
 
 const TopBar = styled.View`
-  marginTop: 15,
-  flexDirection: 'row',
-  flex: 1.5,
-  alignItems: 'center',
+  margin-top: 15;
+  flex-direction: row
+  flex: 1.5;
+  align-items: center;
 `
 
 const HighScore = styled.View`
@@ -33,13 +34,13 @@ const HighScore = styled.View`
 `
 
 const Timeout = styled.View`
-  flex: 1,
+  flex: 1;
   background-color: #000d1a;
   margin: 10;
 `
 
 const CurrentScore = styled.Text`
-  flex: 1,
+  flex: 1;
   background-color: #000d1a;
   margin: 10;
 `
@@ -63,10 +64,10 @@ const Row = styled.View`
 `
 
 const HoleContainer = styled.View`
-  flex: 1,
-  backgroundColor: '#e6f2ff',
-  margin: 10,
-  borderRadius: 10,
+  flex: 1;
+  background-color: '#e6f2ff';
+  margin: 10;
+  border-radius: 10;
 `
 
 const HoleRows = styled.View`
@@ -79,7 +80,7 @@ const HoleRows = styled.View`
 const BottomBar = styled.View`
   padding-top: 20;
   flex: 1;
-  align-items: 'center';
+  align-items: center;
 `
 
 const StartButton = styled.View`
@@ -119,7 +120,7 @@ const Hole = ({hole}) => (
 const Display = ({title, value, is: Base}) => (
   <Base>
     <Title>{title}</Title>
-    <Value>{title}</Value>
+    <Value>{value}</Value>
   </Base>
 )
 
@@ -188,7 +189,7 @@ export default class Game extends Component {
     }
   }
 
-  endGame() {
+  endGame = async () => {
     const {currentScore, highScore} = this.state
 
     clearInterval(this.timer)
@@ -198,15 +199,15 @@ export default class Game extends Component {
     if (currentScore > highScore) {
       Alert.alert('YEAH! you got a new high score.')
 
-      this.setState({highScore: '' + currentScore})
+      this.setState({highScore: currentScore})
     }
 
-    this.save()
+    await this.save()
   }
 
   save = async () => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, this.state.highScore)
+      await AsyncStorage.setItem(HIGH_SCORE_KEY, this.state.highScore)
 
       console.log('Data has been saved!')
     } catch (err) {
@@ -216,11 +217,9 @@ export default class Game extends Component {
 
   async componentDidMount() {
     try {
-      const value = await AsyncStorage.getItem(STORAGE_KEY)
+      const highScore = await AsyncStorage.getItem(HIGH_SCORE_KEY)
 
-      this.setState({
-        highScore: value,
-      })
+      this.setState({highScore})
     } catch (err) {
       console.warn('The previous high score cannot be retrieved:', err.message)
     }

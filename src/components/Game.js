@@ -4,9 +4,14 @@ import styled from 'styled-components/native'
 import createContext from 'create-react-context'
 
 const HIGH_SCORE_KEY = 'game:highScore'
+
+// The default time limit defaults to ten ticks
 const timeLimit = 10
 
-const grids = [...Array(3)].map((_, i) => i)
+// The rows in the game's grid
+const gridRows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+// There are initially nine holes, all which defaults to false
 const initialHoles = [...Array(9)].map(() => false)
 
 const Turtle = ({onPress, show}) => (
@@ -21,28 +26,16 @@ const Container = styled.View`
 `
 
 const TopBar = styled.View`
-  margin-top: 15;
-  flex-direction: row
+  margin-top: 15px;
+  flex-direction: row;
   flex: 1.5;
   align-items: center;
 `
 
-const HighScore = styled.View`
+const DisplayContainer = styled.View`
   flex: 1;
   background-color: #000d1a;
-  margin: 10;
-`
-
-const Timeout = styled.View`
-  flex: 1;
-  background-color: #000d1a;
-  margin: 10;
-`
-
-const CurrentScore = styled.Text`
-  flex: 1;
-  background-color: #000d1a;
-  margin: 10;
+  margin: 10px;
 `
 
 const Title = styled.Text`
@@ -52,7 +45,7 @@ const Title = styled.Text`
 
 const Value = styled.Text`
   text-align: center;
-  font-size: 30;
+  font-size: 30px;
   font-weight: bold;
   color: white;
 `
@@ -66,8 +59,8 @@ const Row = styled.View`
 const HoleContainer = styled.View`
   flex: 1;
   background-color: '#e6f2ff';
-  margin: 10;
-  border-radius: 10;
+  margin: 10px;
+  border-radius: 10px;
 `
 
 const HoleRows = styled.View`
@@ -78,7 +71,7 @@ const HoleRows = styled.View`
 `
 
 const BottomBar = styled.View`
-  padding-top: 20;
+  padding-top: 20px;
   flex: 1;
   align-items: center;
 `
@@ -86,13 +79,13 @@ const BottomBar = styled.View`
 const StartButton = styled.View`
   color: white;
   background-color: darkblue;
-  margin: 20;
-  padding: 10;
+  margin: 20px;
+  padding: 10px;
 `
 
 const Emoji = styled.Text`
   text-align: center;
-  font-size: 50;
+  font-size: 50px;
   padding-top: 25%;
 `
 
@@ -117,11 +110,11 @@ const Hole = ({hole}) => (
   </Consumer>
 )
 
-const Display = ({title, value, is: Base}) => (
-  <Base>
+const Display = ({title, value}) => (
+  <DisplayContainer>
     <Title>{title}</Title>
     <Value>{value}</Value>
-  </Base>
+  </DisplayContainer>
 )
 
 export default class Game extends Component {
@@ -172,7 +165,6 @@ export default class Game extends Component {
     })
 
     this.appearTimer = setInterval(this.showTurtles, 1000)
-
     this.gameTimer = setInterval(this.update, 1000)
   }
 
@@ -236,7 +228,7 @@ export default class Game extends Component {
     } = this.state
 
     return (
-      <Provider values={{holes, handleTouch}}>
+      <Provider value={{holes, handleTouch}}>
         <Container>
           <TopBar>
             <Display label="High Score" value={highScore} is={HighScore} />
@@ -248,8 +240,8 @@ export default class Game extends Component {
             />
           </TopBar>
           <HoleRows>
-            {grids.map(i => (
-              <Row key={i}>{grids.map(j => <Hole key={j} hole={i + j} />)}</Row>
+            {gridRows.map((row, i) => (
+              <Row key={i}>{row.map(col => <Hole key={col} hole={col} />)}</Row>
             ))}
           </HoleRows>
           <BottomBar>

@@ -25,9 +25,9 @@
 		"preset": "react-native"
 	},
 	"lint-staged": {
-    "*.js": [
-        "yarn pretty",
-        "git add"
-    ]
+		"*.js": [
+			"yarn pretty",
+			"git add"
+		]
 	}
 }

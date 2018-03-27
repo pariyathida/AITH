@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import {Alert, AsyncStorage} from 'react-native'
 import styled from 'styled-components/native'
-import createContext from 'create-react-context'
 
 // The key used to store the high score in AsyncStorage
 const HIGH_SCORE_KEY = 'game:highScore'
@@ -94,16 +93,10 @@ const Touch = styled.View`
   justify-content: center;
 `
 
-const {Provider, Consumer} = createContext('turtle')
-
-const Hole = ({hole}) => (
-  <Consumer>
-    {props => (
-      <HoleContainer onPress={() => props.handleTouch(hole)}>
-        <Turtle show={props.holes[hole]} />
-      </HoleContainer>
-    )}
-  </Consumer>
+const Hole = ({hole, holes, handleTouch}) => (
+  <HoleContainer onPress={() => handleTouch(hole)}>
+    <Turtle show={holes[hole]} />
+  </HoleContainer>
 )
 
 const Display = ({title, value}) => (
@@ -226,31 +219,37 @@ export default class Game extends Component {
 
   render = () => {
     const {isPlaying, holes, currentScore, highScore, timeout} = this.state
-    const context = {holes, handleTouch: this.handleTouch}
 
     return (
-      <Provider value={context}>
-        <Container>
-          <TopBar>
-            <Display title="High Score" value={highScore} />
-            <Display title="Timeout" value={timeout} />
-            <Display title="Current Score" value={currentScore} />
-          </TopBar>
-          <HoleRows>
-            {gridRows.map((row, i) => (
-              <Row key={i}>{row.map(col => <Hole key={col} hole={col} />)}</Row>
-            ))}
-          </HoleRows>
-          <BottomBar>
-            <StartButton
-              color="#3498db"
-              title="Start Game"
-              onPress={this.startGame}
-              disabled={isPlaying}
-            />
-          </BottomBar>
-        </Container>
-      </Provider>
+      <Container>
+        <TopBar>
+          <Display title="High Score" value={highScore} />
+          <Display title="Timeout" value={timeout} />
+          <Display title="Current Score" value={currentScore} />
+        </TopBar>
+        <HoleRows>
+          {gridRows.map((row, i) => (
+            <Row key={i}>
+              {row.map(col => (
+                <Hole
+                  key={col}
+                  hole={col}
+                  holes={holes}
+                  handleTouch={this.handleTouch}
+                />
+              ))}
+            </Row>
+          ))}
+        </HoleRows>
+        <BottomBar>
+          <StartButton
+            color="#3498db"
+            title="Start Game"
+            onPress={this.startGame}
+            disabled={isPlaying}
+          />
+        </BottomBar>
+      </Container>
     )
   }
 }

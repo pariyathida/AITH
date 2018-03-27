@@ -1,16 +1,7 @@
 import React, {Component} from 'react'
+import {Alert, AsyncStorage} from 'react-native'
 import styled from 'styled-components/native'
 import createContext from 'create-react-context'
-
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  TouchableHighlight,
-  AsyncStorage,
-} from 'react-native'
 
 const STORAGE_KEY = '@Game:data'
 const timeLimit = 10
@@ -165,7 +156,7 @@ export default class Game extends Component {
   update = () => {
     const {timeout} = this.state
 
-    this.setState({timeout: timeout - 1)
+    this.setState({timeout: timeout - 1})
 
     if (timeout === 0) {
       this.endGame()

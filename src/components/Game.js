@@ -40,8 +40,8 @@ const DisplayContainer = styled.View`
 `
 
 const Title = styled.Text`
-  text-align: center;
   color: white;
+  text-align: center;
 `
 
 const Value = styled.Text`
@@ -211,8 +211,11 @@ export default class Game extends Component {
   async componentDidMount() {
     try {
       const highScore = await AsyncStorage.getItem(HIGH_SCORE_KEY)
+      console.log('Retrieved Previous High Score:', highScore)
 
-      this.setState({highScore})
+      if (highScore) {
+        this.setState({highScore})
+      }
     } catch (err) {
       console.warn('The previous high score cannot be retrieved:', err.message)
     }
@@ -232,9 +235,9 @@ export default class Game extends Component {
       <Provider value={{holes, handleTouch}}>
         <Container>
           <TopBar>
-            <Display label="High Score" value={highScore} />
-            <Display label="Timeout" value={timeout} />
-            <Display label="Current Score" value={currentScore} />
+            <Display title="High Score" value={highScore} />
+            <Display title="Timeout" value={timeout} />
+            <Display title="Current Score" value={currentScore} />
           </TopBar>
           <HoleRows>
             {gridRows.map((row, i) => (

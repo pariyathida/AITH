@@ -3,6 +3,7 @@ import {Alert, AsyncStorage} from 'react-native'
 import styled from 'styled-components/native'
 import createContext from 'create-react-context'
 
+// The key used to store the high score in AsyncStorage
 const HIGH_SCORE_KEY = 'game:highScore'
 
 // The default time limit defaults to ten ticks
@@ -231,13 +232,9 @@ export default class Game extends Component {
       <Provider value={{holes, handleTouch}}>
         <Container>
           <TopBar>
-            <Display label="High Score" value={highScore} is={HighScore} />
-            <Display label="Timeout" value={timeout} is={Timeout} />
-            <Display
-              label="Current Score"
-              value={currentScore}
-              is={CurrentScore}
-            />
+            <Display label="High Score" value={highScore} />
+            <Display label="Timeout" value={timeout} />
+            <Display label="Current Score" value={currentScore} />
           </TopBar>
           <HoleRows>
             {gridRows.map((row, i) => (

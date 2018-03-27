@@ -57,7 +57,7 @@ const Row = styled.View`
   background-color: #00264d;
 `
 
-const HoleContainer = styled.View`
+const HoleContainer = styled.TouchableOpacity`
   flex: 1;
   background-color: #e6f2ff;
   margin: 10px;
@@ -77,9 +77,7 @@ const BottomBar = styled.View`
   align-items: center;
 `
 
-const StartButton = styled.Text`
-  color: white;
-  background-color: darkblue;
+const StartButton = styled.Button`
   margin: 20px;
   padding: 10px;
 `
@@ -101,11 +99,8 @@ const {Provider, Consumer} = createContext('turtle')
 const Hole = ({hole}) => (
   <Consumer>
     {props => (
-      <HoleContainer>
-        <Turtle
-          show={props.holes[hole]}
-          onPress={() => props.handleTouch(hole)}
-        />
+      <HoleContainer onPress={() => props.handleTouch(hole)}>
+        <Turtle show={props.holes[hole]} />
       </HoleContainer>
     )}
   </Consumer>
@@ -125,6 +120,47 @@ export default class Game extends Component {
     timeout: 0,
     playing: false,
     holes: initialHoles,
+  }
+
+  async componentDidMount() {
+    try {
+      const highScore = await AsyncStorage.getItem(HIGH_SCORE_KEY)
+
+      if (highScore) {
+        console.log('Retrieved Previous High Score:', highScore)
+
+        this.setState({highScore: parseInt(highScore)})
+      }
+    } catch (err) {
+      console.warn('The previous high score cannot be retrieved:', err.message)
+    }
+  }
+
+  startGame = () => {
+    this.setState({
+      timeout: timeLimit,
+      isPlaying: true,
+      currentScore: 0,
+    })
+
+    // Initiate the Game Timer and Appear Timer
+    this.timer = setInterval(this.update, 1000)
+    this.appearTimer = setInterval(this.showTurtles, 1000)
+  }
+
+  handleTouch = number => {
+    const {holes} = this.state
+
+    if (holes[number]) {
+      holes[number] = false
+
+      console.log('Hole', number, 'has been touched.')
+
+      this.setState({
+        currentScore: this.state.currentScore + 1,
+        holes,
+      })
+    }
   }
 
   showTurtles = () => {
@@ -148,43 +184,18 @@ export default class Game extends Component {
     }
   }
 
-  update = () => {
+  update = async () => {
     const {timeout} = this.state
 
-    this.setState({timeout: timeout - 1})
-
     if (timeout === 0) {
-      this.endGame()
-    }
-  }
-
-  startGame = () => {
-    this.setState({
-      timeout: timeLimit,
-      isPlaying: true,
-      currentScore: 0,
-    })
-
-    this.appearTimer = setInterval(this.showTurtles, 1000)
-    this.gameTimer = setInterval(this.update, 1000)
-  }
-
-  handleTouch = holeNumber => {
-    const {holes} = this.state
-
-    if (holes[holeNumber]) {
-      holes[holeNumber] = false
-
-      this.setState({
-        currentScore: this.state.currentScore + 1,
-        holes,
-      })
+      await this.endGame()
+    } else {
+      this.setState({timeout: timeout - 1})
     }
   }
 
   endGame = async () => {
     const {currentScore, highScore} = this.state
-
     clearInterval(this.timer)
 
     this.setState({playing: false})
@@ -199,40 +210,26 @@ export default class Game extends Component {
   }
 
   save = async () => {
-    try {
-      await AsyncStorage.setItem(HIGH_SCORE_KEY, this.state.highScore)
+    const {highScore} = this.state
 
-      console.log('Data has been saved!')
+    try {
+      if (highScore) {
+        // AsyncStorage requires all inputs to be a string on iOS
+        await AsyncStorage.setItem(HIGH_SCORE_KEY, highScore.toString())
+      }
+
+      console.log('Your high score of', highScore, 'has been saved!')
     } catch (err) {
       console.warn('The high score cannot be saved:', err.message)
     }
   }
 
-  async componentDidMount() {
-    try {
-      const highScore = await AsyncStorage.getItem(HIGH_SCORE_KEY)
-      console.log('Retrieved Previous High Score:', highScore)
-
-      if (highScore) {
-        this.setState({highScore})
-      }
-    } catch (err) {
-      console.warn('The previous high score cannot be retrieved:', err.message)
-    }
-  }
-
   render = () => {
-    const {
-      isPlaying,
-      holes,
-      handleTouch,
-      currentScore,
-      highScore,
-      timeout,
-    } = this.state
+    const {isPlaying, holes, currentScore, highScore, timeout} = this.state
+    const context = {holes, handleTouch: this.handleTouch}
 
     return (
-      <Provider value={{holes, handleTouch}}>
+      <Provider value={context}>
         <Container>
           <TopBar>
             <Display title="High Score" value={highScore} />
@@ -246,6 +243,7 @@ export default class Game extends Component {
           </HoleRows>
           <BottomBar>
             <StartButton
+              color="#3498db"
               title="Start Game"
               onPress={this.startGame}
               disabled={isPlaying}

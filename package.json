@@ -6,6 +6,8 @@
 		"start": "node node_modules/react-native/local-cli/cli.js start",
 		"pretty": "prettier --write --tab-width 4 \"./**/*.js\"",
 		"precommit": "lint-staged && npm test",
+		"android": "react-native run-android",
+		"ios": "react-native run-ios",
 		"test": "jest"
 	},
 	"dependencies": {
@@ -19,6 +21,8 @@
 		"jest": "^22.4.3",
 		"lint-staged": "^7.0.0",
 		"prettier": "^1.11.1",
+		"jest": "20.0.4",
+		"react-native-scripts": "^1.11.1",
 		"react-test-renderer": "16.0.0-alpha.12"
 	},
 	"jest": {

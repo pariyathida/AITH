@@ -1,13 +1,5 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import {AppRegistry} from 'react-native'
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-} from 'react-native';
+import Game from './src/components/Game'
 
-import Game from './game.js';
-AppRegistry.registerComponent('Game', () => Game);
+AppRegistry.registerComponent('Game', () => Game)

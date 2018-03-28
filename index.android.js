@@ -9,5 +9,5 @@ import {
   AppRegistry,
 } from 'react-native';
 
-import Game from './game.js';
+import Game from './src/containers/main.js';
 AppRegistry.registerComponent('Game', () => Game);

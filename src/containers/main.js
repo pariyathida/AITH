@@ -17,15 +17,9 @@ import {
 const STORAGE_KEY = '@Game:data';
 var timeLimit=10;
 var timer = null;
-var Turtle = React.createClass({
-    render(){
-        return(
-            <TouchableHighlight  style={styles.touch} onPress={this.props.onPress}>
-                <Text style={styles.icon}>{this.props.show ? '🐢':''}</Text>
-            </TouchableHighlight>
-        )
-    }
-})
+
+import Turtle from '../components/TurtleBlock';
+import ButtonPlay from '../components/ButtonPlay'
 
 export default class Game extends Component {
 
@@ -36,13 +30,25 @@ export default class Game extends Component {
             currentScore: 0,
             timeout: 0,
             playing: false,
-            holes: [false, false, false,
-                    false, false, false,
-                    false, false, false]
+            holes: [
+                false, false, false,
+                false, false, false,
+                false, false, false
+            ]
         }
     }
+
+    componentDidMount(){
+        AsyncStorage.getItem(STORAGE_KEY)
+        .then((value)=>{
+            this.setState({
+                highScore: value,
+            })
+        }).catch((error)=>console.log('AsyncStorage: '+ error.message))
+        .done();
+    }
     
-    _startGame(){
+    _startGame = () => {
         this.setState({
             timeout: timeLimit,
             playing: true,
@@ -80,7 +86,7 @@ export default class Game extends Component {
         }, 1000);
     }
 
-    _handleTouch(holeNumber){
+    _handleTouch = (holeNumber) => {
         currentHoles = this.state.holes;
         if(currentHoles[holeNumber]==true){
             currentHoles[holeNumber]=false;
@@ -113,17 +119,8 @@ export default class Game extends Component {
         .done();
     }
 
-    componentDidMount(){
-        AsyncStorage.getItem(STORAGE_KEY)
-        .then((value)=>{
-            this.setState({
-                highScore: value,
-            })
-        }).catch((error)=>console.log('AsyncStorage: '+ error.message))
-        .done();
-    }
-
   render() {
+      const setBlockSize = [ [ 0, 1, 2 ], [ 3, 4, 5 ], [ 6, 7, 8 ] ]
     return (
       <View style={styles.container}>
         <View style={styles.topBar}>
@@ -140,47 +137,15 @@ export default class Game extends Component {
                  <Text style={styles.number}>{this.state.currentScore}</Text>
             </View>
         </View>
-        <View style={styles.holeRows}>
-            <View style={styles.row}>
-                <View style={styles.hole}>
-                   <Turtle show={this.state.holes[0]} onPress={() => this._handleTouch(0)}/>
-                </View>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[1]} onPress={() => this._handleTouch(1)}/>
-                </View>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[2]} onPress={() => this._handleTouch(2)}/>
-                </View>
-            </View>
-            <View style={styles.row}>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[3]} onPress={() => this._handleTouch(3)}/>
-                </View>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[4]} onPress={() => this._handleTouch(4)}/>
-                </View>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[5]} onPress={() => this._handleTouch(5)}/>
-                </View>
-            </View>
-            <View style={styles.row}>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[6]} onPress={() => this._handleTouch(6)}/>
-                </View>
-                <View style={styles.hole}>
-                   <Turtle show={this.state.holes[7]} onPress={() => this._handleTouch(7)}/>
-                </View>
-                <View style={styles.hole}>
-                    <Turtle show={this.state.holes[8]} onPress={() => this._handleTouch(8)}/>
-                </View>
-            </View>
-        </View>
-        <View style={styles.buttomBar}>
-            <Button title="start game" 
-                    style={styles.startButton} 
-                    onPress={this._startGame.bind(this)}
-                    disabled={this.state.playing}/>
-        </View>
+        <Turtle
+            blockSize={ setBlockSize }
+            show={ this.state.holes }
+            onPress={ this._handleTouch }
+        />
+        <ButtonPlay
+            playing={ this.state.playing }
+            onPress={ this._startGame }
+        />
       </View>
     );
   }
@@ -238,46 +203,10 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: 'white',
   },
-  holeRows: {
-      flex: 7,
-      flexDirection: 'column',
-      borderWidth: 1,
-      width: '100%',
-  },
-  row:{
-     flex: 1,
-     flexDirection: 'row',
-     backgroundColor: '#00264d'
-  },
   hole:{
     flex: 1,
     backgroundColor: '#e6f2ff',
     margin: 10,
      borderRadius: 10,
   },
-  buttomBar: {
-         paddingTop: 20,
-      flex: 1,
-      alignItems: 'center',
-  },
-  startButton: {
-   
-      color: 'white',
-      backgroundColor: 'darkblue',
-      margin: 20,
-      padding: 10,
-  },
-    icon: {
-        textAlign: 'center',
-        fontSize: 50,
-        paddingTop: '25%',
-    },
-    touch: {
-        flex:1,
-        borderRadius: 10,
-        justifyContent: 'center',
-    }
-
-
-
 });

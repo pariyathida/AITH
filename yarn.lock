@@ -4464,6 +4464,12 @@ react-devtools-core@2.3.1:
     shell-quote "^1.6.1"
     ws "^2.0.3"
 
+react-native-awesome-alerts@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-awesome-alerts/-/react-native-awesome-alerts-1.0.7.tgz#60344ab2044b994b77a9fc95f612b8347e31d1d6"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-scripts@^1.11.1:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/react-native-scripts/-/react-native-scripts-1.11.1.tgz#a9f0a5c91a85d34acee9ec9012cf614665670b80"

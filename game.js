@@ -14,6 +14,9 @@ import {
   TouchableHighlight,
   AsyncStorage,
 } from 'react-native';
+
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 const STORAGE_KEY = '@Game:data';
 var timeLimit=10;
 var timer = null;
@@ -36,6 +39,7 @@ export default class Game extends Component {
             currentScore: 0,
             timeout: 0,
             playing: false,
+            showAlert: false,
             holes: [false, false, false,
                     false, false, false,
                     false, false, false]
@@ -97,7 +101,8 @@ export default class Game extends Component {
             playing: false,
         })
         if(this.state.currentScore>this.state.highScore){
-            alert('YEAH! you got a new high score');
+            // alert('YEAH! you got a new high score');
+            this._showAlert();
             this.setState({
                 highScore: ""+this.state.currentScore,
             })
@@ -113,6 +118,18 @@ export default class Game extends Component {
         .done();
     }
 
+    _showAlert = () => {
+        this.setState({
+            showAlert: true
+        });
+    };
+
+    _hideAlert = () => {
+        this.setState({
+            showAlert: false
+        });
+    };
+
     componentDidMount(){
         AsyncStorage.getItem(STORAGE_KEY)
         .then((value)=>{
@@ -124,6 +141,8 @@ export default class Game extends Component {
     }
 
   render() {
+    const { showAlert } = this.state;
+
     return (
       <View style={styles.container}>
         <View style={styles.topBar}>
@@ -181,6 +200,21 @@ export default class Game extends Component {
                     onPress={this._startGame.bind(this)}
                     disabled={this.state.playing}/>
         </View>
+        <AwesomeAlert
+            show={showAlert}
+            showProgress={false}
+            title="Alert"
+            message="YEAH! you got a new high score"
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            confirmText="Yes"
+            confirmButtonColor="#b7eb8f"
+            onConfirmPressed={() => {
+                this._hideAlert();
+            }}
+        />
       </View>
     );
   }

@@ -6,6 +6,7 @@
 
 import React, { Component } from "react";
 import { AppRegistry, StyleSheet, Text, View } from "react-native";
+import Game from "./game.js";
 
 export default class testapp extends Component {
     render() {
@@ -43,4 +44,4 @@ const styles = StyleSheet.create({
     }
 });
 
-AppRegistry.registerComponent("testapp", () => testapp);
+AppRegistry.registerComponent("Game", () => Game);

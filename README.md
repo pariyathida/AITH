@@ -6,9 +6,7 @@ Let catch a turtle game!
 
 ## Preview
 
-![Game Screenshot](example.png)
-
-![iOS](ios.png)
+![Game Screenshot](https://raw.githubusercontent.com/DEKCOMSTORY/AITH/master/example.png)
 
 ## Usage
 
